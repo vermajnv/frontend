@@ -5,11 +5,10 @@ import Card from '../../shared/components/UIElements/Card/Card';
 import './UserItem.css'
 
 const UserItem = ({userData}) => {
-    console.log(userData.image);
   return (
     <li className='user-item'>
         <Card className="user-item__content">
-            <Link to={`/user/${userData.id}/places`}>
+            <Link to={`/${userData.id}/places`}>
                 <div className="user-item__image">
                     <Avatar image={userData.image} alt={userData.name}></Avatar>
                 </div>
