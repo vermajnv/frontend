@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import Card from '../../shared/components/UIElements/Card/Card';
 import Button from '../../shared/components/FormElements/Button/Button';
 import Modal from '../../shared/components/UIElements/Modal/Modal';
-
+import Maps from '../../shared/components/UIElements/Maps/Maps';
 import './PlaceItem.css';
 
 const PlaceItem = ({props}) => {
@@ -26,7 +26,7 @@ const PlaceItem = ({props}) => {
         footer={<Button onClick={hideMapHandler}>CLOSE</Button>}
     >
         <div className="map-container">
-            <h2>The map</h2>
+            <Maps center={props}></Maps>
         </div>
     </Modal>
     <li className='place-item'>

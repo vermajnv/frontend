@@ -11,7 +11,7 @@ const DUMMY_PLACES = [
         description : 'One of the most famous sky scraper in the world',
         imageUrl : 'https://placehold.co/600x400',
         address : '20 W 34th St., New York, NY 10001, United States',
-        coodinate : {
+        coordinate : {
             lat : 40.7484405,
             long : -73.9856644
         },
@@ -23,7 +23,7 @@ const DUMMY_PLACES = [
         description : 'One of the most famous sky scraper in the world',
         imageUrl : 'https://placehold.co/600x400',
         address : '20 W 34th St., New York, NY 10001, United States',
-        coodinate : {
+        coordinate : {
             lat : 40.7484405,
             long : -73.9856644
         },
@@ -35,7 +35,7 @@ const DUMMY_PLACES = [
         description : 'One of the most famous sky scraper in the world',
         imageUrl : 'https://placehold.co/600x400',
         address : '20 W 34th St., New York, NY 10001, United States',
-        coodinate : {
+        coordinate : {
             lat : 40.7484405,
             long : -73.9856644
         },
@@ -47,7 +47,7 @@ const DUMMY_PLACES = [
         description : 'One of the most famous sky scraper in the world',
         imageUrl : 'https://placehold.co/600x400',
         address : '20 W 34th St., New York, NY 10001, United States',
-        coodinate : {
+        coordinate : {
             lat : 40.7484405,
             long : -73.9856644
         },
