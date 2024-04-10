@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import Button from '../../shared/components/FormElements/Button/Button';
 import Input from '../../shared/components/FormElements/Input/Input';
+import Card from '../../shared/components/UIElements/Card/Card';
 import { VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/utils/validators';
 import { useForm } from '../../shared/hooks/form-hook';
 import './PlaceForm.css'
@@ -59,36 +60,69 @@ const DUMMY_PLACES = [
 ];
 
 const UpdatePlace = () => {
+    const [isLoading, setIsLoading] = useState(true);
     const placeId = useParams().placeId;
+
+    const [formState, inputHandler, setFormData] = useForm({
+        title : {
+            value : '', 
+            isValid : false
+        },
+        description : {
+            value : '',
+            isValid : false
+        },
+        address : {
+            value : '',
+            isValid : false
+        }
+    }, false);
+
     const [myPlace] = DUMMY_PLACES.filter((place) => {
         return place.id === placeId;
     });
-
-    const [formState, inputHandler] = useForm({
-        title : {
-            value : myPlace.title,
-            isValid : true
-        },
-        description : {
-            value : myPlace.description,
-            isValid : true
-        },
-        address : {
-            value : myPlace.address,
-            isValid : true
+    useEffect(() => {
+        if(myPlace)
+        {
+            setFormData({
+                title : {
+                    value : myPlace.title,
+                    isValid : true
+                },
+                description : {
+                    value : myPlace.description,
+                    isValid : true
+                },
+                address : {
+                    value : myPlace.address,
+                    isValid : true
+                }
+            }, true);
         }
-    }, true);
+        setIsLoading(false);
+    }, [myPlace, setFormData]);    
 
     if(!myPlace)
     {
         return (
-            <div>No place found</div>
+            <div className='center'>
+                <Card>
+                    <h2>No place found</h2>
+                </Card>
+            </div>
         )
     }
 
     const updateSubmitHandler = (event) => {
         event.preventDefault();
         console.log(formState.inputs);
+    }
+
+    if(isLoading) 
+    {
+        return (
+            <div className='center'>Loading</div>
+        )
     }
   return (
     <form className='place-form' onSubmit={updateSubmitHandler}>
