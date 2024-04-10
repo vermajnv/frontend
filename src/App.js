@@ -1,4 +1,4 @@
-import React  from "react";
+import React,{ useCallback, useState }   from "react";
 
 import {BrowserRouter as Router, Route, Routes, Navigate} from "react-router-dom";
 import Users from "./user/pages/Users";
@@ -7,14 +7,24 @@ import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import UserPlaces from "./places/pages/UserPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
 import Authenticate from "./user/pages/Authenticate";
+import { AuthContext } from "./shared/context/auth-context";
 
 function App() {
+  const [isLogin, setIsLogin] = useState(false);
+
+  const login = useCallback(() => {
+    setIsLogin(true)
+  }, [])
+
+  const logout = useCallback(() => {
+    setIsLogin(false)
+  }, [])
 
   return (
+    <AuthContext.Provider value={{isLogin : isLogin, login : login, logout : logout}}>
       <Router>
-        <MainNavigation></MainNavigation>
         <main>
-
+        <MainNavigation></MainNavigation>
           <Routes>
               <Route path="/" element={<Users></Users>} exact></Route>
               <Route path="/:userId/places" element={<UserPlaces/>}></Route>
@@ -25,6 +35,7 @@ function App() {
           </Routes>
         </main>
       </Router>
+    </AuthContext.Provider>
   );
 }
 
