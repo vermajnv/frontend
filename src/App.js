@@ -6,6 +6,7 @@ import NewPlace from "./places/pages/NewPlace";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import UserPlaces from "./places/pages/UserPlaces";
 import UpdatePlace from "./places/pages/UpdatePlace";
+import Authenticate from "./user/pages/Authenticate";
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
               <Route path="/:userId/places" element={<UserPlaces/>}></Route>
               <Route path="/places/new" element={<NewPlace></NewPlace>}></Route>
               <Route path="/places/:placeId" element={<UpdatePlace></UpdatePlace>}></Route>
+              <Route path="/auth" element={<Authenticate></Authenticate>}></Route>
               <Route path="*" element={<Navigate to="/not-found"></Navigate>}></Route>
           </Routes>
         </main>
