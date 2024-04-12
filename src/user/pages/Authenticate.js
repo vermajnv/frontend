@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 
 import Input from '../../shared/components/FormElements/Input/Input'
 import Button from '../../shared/components/FormElements/Button/Button'
@@ -6,8 +6,11 @@ import './Authenticate.css'
 import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/utils/validators'
 import { useForm } from '../../shared/hooks/form-hook'
 import Card from '../../shared/components/UIElements/Card/Card'
+import { AuthContext } from '../../shared/context/auth-context'
+import { useNavigate } from 'react-router-dom'
 
 const Authenticate = () => {
+    const auth = useContext(AuthContext);
     const [isLoginMode, setIsLoginMode] = useState(true)
     const [formState, inputHandler, setFormData] = useForm({
         email : {
@@ -39,8 +42,12 @@ const Authenticate = () => {
         }
         setIsLoginMode(prevMode => !prevMode)
     }
+
+    const navigate = useNavigate();
     const loginHandler = (event) => {
         event.preventDefault()
+        auth.login();
+        navigate('/')
         console.log(formState.inputs);
     }
 
