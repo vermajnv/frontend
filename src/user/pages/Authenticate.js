@@ -44,8 +44,43 @@ const Authenticate = () => {
     }
 
     const navigate = useNavigate();
-    const loginHandler = (event) => {
-        event.preventDefault()
+
+    const loginHandler = async (event) => {
+        event.preventDefault();
+        let data, responseData;
+        try {
+            if(!isLoginMode) {
+                data = await fetch('http://localhost:4000/api/users/signup', {
+                    method : 'POST',
+                    headers : {
+                        'Content-Type' : 'application/json'
+                    },
+                    body : JSON.stringify({
+                        name : formState.inputs.name.value,
+                        email : formState.inputs.email.value,
+                        password : formState.inputs.password.value
+                    })
+                });
+                responseData = await data.json();
+            }
+            else {
+                data = await fetch('http://localhost:4000/api/users/login', {
+                    method : 'POST',
+                    headers : {
+                        'Content-Type' : 'application/json'
+                    },
+                    body : JSON.stringify({
+                        email : formState.inputs.email.value,
+                        password : formState.inputs.password.value
+                    })
+                });
+                responseData = await data.json()
+            }
+        }
+        catch (err) {
+            console.log(err);
+        }
+        
         auth.login();
         navigate('/')
         console.log(formState.inputs);
