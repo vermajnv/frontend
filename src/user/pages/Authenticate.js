@@ -8,10 +8,15 @@ import { useForm } from '../../shared/hooks/form-hook'
 import Card from '../../shared/components/UIElements/Card/Card'
 import { AuthContext } from '../../shared/context/auth-context'
 import { useNavigate } from 'react-router-dom'
+import LoadingSpinner from '../../shared/components/UIElements/Loading/LoadingSpinner';
+import ErrorModal from '../../shared/components/UIElements/Modal/ErrorModal'
 
 const Authenticate = () => {
     const auth = useContext(AuthContext);
-    const [isLoginMode, setIsLoginMode] = useState(true)
+    const [isLoginMode, setIsLoginMode] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState();
+
     const [formState, inputHandler, setFormData] = useForm({
         email : {
             value : '',
@@ -47,9 +52,10 @@ const Authenticate = () => {
 
     const loginHandler = async (event) => {
         event.preventDefault();
+        setIsLoading(true);
         let data, responseData;
-        try {
-            if(!isLoginMode) {
+        if(!isLoginMode) {
+            try {
                 data = await fetch('http://localhost:4000/api/users/signup', {
                     method : 'POST',
                     headers : {
@@ -63,7 +69,13 @@ const Authenticate = () => {
                 });
                 responseData = await data.json();
             }
-            else {
+            catch (err) {
+                console.log(err);
+                setError(err.message || 'Something went wrong Please try again')
+            }
+        }
+        else {
+            try {
                 data = await fetch('http://localhost:4000/api/users/login', {
                     method : 'POST',
                     headers : {
@@ -74,22 +86,33 @@ const Authenticate = () => {
                         password : formState.inputs.password.value
                     })
                 });
-                responseData = await data.json()
+                responseData = await data.json();
+                if(!data.ok)
+                {
+                    throw new Error(responseData.message);
+                }
+                setIsLoading(false);
+                auth.login();
+                navigate('/')
+            }
+            catch (err) {
+                console.log(err);
+                setIsLoading(false);
+                setError(err.message || 'Something went wrong. Please try again');
             }
         }
-        catch (err) {
-            console.log(err);
-        }
-        
-        auth.login();
-        navigate('/')
         console.log(formState.inputs);
     }
 
-    console.log(formState);
+    const errorHandler = () => {
+        setError('');
+    }   
 
   return (
+    <>
+        <ErrorModal error={error} onClear={errorHandler}></ErrorModal>
         <Card className='authentication'>
+            { isLoading && <LoadingSpinner asOverlay></LoadingSpinner>}
             <h2>Login Required</h2>
             <hr />
             <form onSubmit={loginHandler}>
@@ -129,6 +152,7 @@ const Authenticate = () => {
             </form>
             <Button inverse onClick={switchModeHandler}>Switch To {isLoginMode ? 'SIGNUP' : 'SIGNIN'}</Button>
         </Card>
+    </>
   )
 
 }
