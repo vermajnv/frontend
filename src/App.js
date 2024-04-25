@@ -12,9 +12,11 @@ import PrivateRoutes from "./shared/utils/PrivateRoutes";
 
 function App() {
   const [isLogin, setIsLogin] = useState(false);
+  const [userId, setUserId] = useState(null);
 
-  const login = useCallback(() => {
-    setIsLogin(true)
+  const login = useCallback((userId) => {
+    setIsLogin(true);
+    setUserId(userId);
   }, [])
 
   const logout = useCallback(() => {
@@ -22,7 +24,7 @@ function App() {
   }, [])
 
   return (
-    <AuthContext.Provider value={{isLogin : isLogin, login : login, logout : logout}}>
+    <AuthContext.Provider value={{userId : userId, isLogin : isLogin, login : login, logout : logout}}>
       <Router>
         <main>
         <MainNavigation></MainNavigation>

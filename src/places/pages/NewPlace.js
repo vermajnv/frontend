@@ -1,12 +1,19 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import Input from '../../shared/components/FormElements/Input/Input'
 import {VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE} from '../../shared/utils/validators'
 import Button from '../../shared/components/FormElements/Button/Button';
 import { useForm } from '../../shared/hooks/form-hook';
 import './PlaceForm.css'
-
+import { useHttpRequest } from '../../shared/hooks/http-hook';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../shared/context/auth-context';
+import LoadingSpinner from '../../shared/components/UIElements/Loading/LoadingSpinner';
+import ErrorModal from '../../shared/components/UIElements/Modal/ErrorModal';
 const NewPlace = () => {
+  const auth = useContext(AuthContext);
+  const navigate = useNavigate();
+  const {isLoading, error, sendRequest, clearError} = useHttpRequest();
   const [formState, inputHandler] = useForm({
     title : {
       value : '',
@@ -23,37 +30,62 @@ const NewPlace = () => {
   }, false);
 
 
-  const submitHandler = (event) => {
+  const submitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs);
+    try {
+      await sendRequest('http://localhost:4000/api/places', 'POST', 
+      JSON.stringify({
+        title : formState.inputs.title.value,
+        description : formState.inputs.description.value,
+        address : formState.inputs.address.value,
+        creator : auth.userId
+      }), 
+      {
+        "Content-Type" : "application/json"
+      });
+      navigate('/');
+    }
+    catch (err)
+    {
+      console.log(err);
+    }
   }
-  return ( 
-    <form className='place-form' onSubmit={submitHandler}>
-      <Input 
-        id='title'
-        element='input' 
-        type='text' 
-        placeholder='Text' 
-        validators={[VALIDATOR_REQUIRE()]} 
-        errorText="Please enter a valid title" 
-        onInput={inputHandler}>
-      </Input>
-      <Input 
-        id='description' 
-        element='textarea' 
-        validators={[VALIDATOR_MINLENGTH(5)]} 
-        errorText="Please enter a valid descption. (At least 5 char)" 
-        onInput={inputHandler}>
-      </Input>
-      <Input
-        id='address'
-        element='text'
-        validators={[VALIDATOR_MINLENGTH(1)]}
-        errorText='Please enter a valid address'
-        onInput={inputHandler}
-      ></Input>
-      <Button type='Submit' disabled={!formState.isValid} >Submit</Button>
-    </form>
+  return (
+    <>
+      { error && <ErrorModal error={error} onClear={clearError}></ErrorModal>}
+
+      <form className='place-form' onSubmit={submitHandler}>
+        {isLoading && <LoadingSpinner asOverlay></LoadingSpinner>} 
+        <Input 
+          id='title'
+          element='input' 
+          label='Title'
+          type='text' 
+          placeholder='Text' 
+          validators={[VALIDATOR_REQUIRE()]} 
+          errorText="Please enter a valid title" 
+          onInput={inputHandler}>
+        </Input>
+        <Input 
+          id='description' 
+          label='Description'
+          element='textarea' 
+          validators={[VALIDATOR_MINLENGTH(5)]} 
+          errorText="Please enter a valid descption. (At least 5 char)" 
+          onInput={inputHandler}>
+        </Input>
+        <Input
+          id='address'
+          label='Address'
+          element='text'
+          placeholder='Address'
+          validators={[VALIDATOR_MINLENGTH(1)]}
+          errorText='Please enter a valid address'
+          onInput={inputHandler}
+        ></Input>
+        <Button type='Submit' disabled={!formState.isValid} >Submit</Button>
+      </form>
+    </>
   )
 }
 
