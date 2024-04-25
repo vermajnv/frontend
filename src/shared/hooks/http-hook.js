@@ -16,7 +16,7 @@ export const useHttpRequest = () =>
                 headers,
                 signal : httpAbortController.signal
             });
-            
+            console.log(responseData);
             const response = await responseData.json();
 
             activeHttpRequests.current = activeHttpRequests.current.filter(reqController => reqController !== httpAbortController)
@@ -40,6 +40,7 @@ export const useHttpRequest = () =>
 
     useEffect(() => {
         return () => {
+            console.log(activeHttpRequests);
             activeHttpRequests.current.forEach(abortController => abortController.abort())
         }
     }, []);

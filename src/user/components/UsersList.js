@@ -16,7 +16,7 @@ const UsersList = (props) => {
     return <ul className='users-list'>
         {
             props.items.map(user => (
-                <UserItem userData={user} key={user.id}></UserItem>
+                <UserItem userData={user} key={user._id}></UserItem>
             ))
         }
     </ul>
