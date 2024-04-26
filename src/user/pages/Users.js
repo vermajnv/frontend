@@ -23,7 +23,7 @@ const Users = () => {
     sendUserRequest();
 
     return () => {
-
+      
     }
   }, [sendRequest]);
 

@@ -94,6 +94,7 @@ const Authenticate = () => {
               "Content-Type": "application/json",
             }
         );
+        console.log(user);
         auth.login(user.user._id);
         navigate("/");
       } catch (err) {

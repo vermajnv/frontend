@@ -4,10 +4,15 @@ import Card from '../../shared/components/UIElements/Card/Card';
 import Button from '../../shared/components/FormElements/Button/Button';
 import Modal from '../../shared/components/UIElements/Modal/Modal';
 import Maps from '../../shared/components/UIElements/Maps/Maps';
+import ErrorModal from '../../shared/components/UIElements/Modal/ErrorModal';
+import LoadingSpinner from '../../shared/components/UIElements/Loading/LoadingSpinner';
 import './PlaceItem.css';
 import { AuthContext } from '../../shared/context/auth-context';
+import { useHttpRequest } from '../../shared/hooks/http-hook';
 
-const PlaceItem = ({props}) => {
+const PlaceItem = (props) => {
+    console.log(props);
+    const {isLoading, error, sendRequest, clearError} = useHttpRequest()
     const auth = useContext(AuthContext);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showMap, setShowMap] = useState(false);
@@ -23,29 +28,39 @@ const PlaceItem = ({props}) => {
         setShowConfirmModal(true)
     }
 
-    const hideConfirmModalHander = () => {
-        setShowConfirmModal(false)
-    }
+    // const hideConfirmModalHander = () => {
+    //     setShowConfirmModal(false)
+    // }
 
-    const deletePlaceHandler = () => {
-        console.log('Deleting Place');
-        setShowConfirmModal(false)
+    const deletePlaceHandler = async() => {
+        setShowConfirmModal(false);
+        try {
+            await sendRequest(`http://localhost:4000/api/places/${props.place.id}`, 
+                'DELETE',
+            );
+            props.onDelete(props.place.id)
+        }
+        catch(err)
+        {
+
+        }
     }
     const cancelDeletePlaceHandler = () => {
         setShowConfirmModal(false)
     }
 
     return <>
+    <ErrorModal error={error} onClear={clearError}></ErrorModal>
     <Modal 
         show={showMap} 
         onCancel={hideMapHandler}
-        header={props.address}
+        header={props.place.address}
         contentClass="place-item__modal-content"
         footerClass="footer-item__modal-actions"
         footer={<Button onClick={hideMapHandler}>CLOSE</Button>}
     >
         <div className="map-container">
-            <Maps center={props}></Maps>
+            <Maps center={props.place}></Maps>
         </div>
     </Modal>
     <Modal
@@ -62,17 +77,18 @@ const PlaceItem = ({props}) => {
     </Modal>
     <li className='place-item'>
         <Card className='place-item__content'>
+        {isLoading && <LoadingSpinner asOverlay></LoadingSpinner>}
             <div className="place-item__image">
-                <img src={props.imageUrl} alt={props.title} />
+                <img src={props.place.image} alt={props.place.title} />
             </div>
             <div className="place-item__info">
-                <h2>{props.title}</h2>
-                <h3>{props.address}</h3>
-                <p>{props.description}</p>
+                <h2>{props.place.title}</h2>
+                <h3>{props.place.address}</h3>
+                <p>{props.place.description}</p>
             </div>
             <div className="place-item__actions">
                 <Button inverse onClick={openMapHandler}>View On Map</Button>
-                {auth.isLogin && <Button to={`/places/${props.id}`}>EDIT</Button>}
+                {auth.isLogin && <Button to={`/places/${props.place.id}`}>EDIT</Button>}
                 {auth.isLogin && <Button danger onClick={showConfirmModalHandler}>DELETE</Button>}
             </div>
         </Card> 

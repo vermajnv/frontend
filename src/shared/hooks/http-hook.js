@@ -1,54 +1,54 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export const useHttpRequest = () =>
-{
-    const [error, setError] = useState();
+export const useHttpRequest = () => {
+    const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const activeHttpRequests = useRef([]);
-    const sendRequest = useCallback( async (url, method = 'GET', body = null, headers = {}) => {
+
+    const sendRequest = useCallback(async (url, method = 'GET', body = null, headers = {}) => {
         const httpAbortController = new AbortController();
         activeHttpRequests.current.push(httpAbortController);
+
         try {
             setIsLoading(true);
-            const responseData = await fetch(url, {
-                method, 
-                body, 
+            const response = await fetch(url, {
+                method,
+                body,
                 headers,
-                signal : httpAbortController.signal
+                signal: httpAbortController.signal
             });
-            console.log(responseData);
-            const response = await responseData.json();
 
-            activeHttpRequests.current = activeHttpRequests.current.filter(reqController => reqController !== httpAbortController)
-            if(!responseData.ok)
-            {
-                throw new Error(response.message);
+            if (!response.ok) {
+                throw new Error('Request failed with status ' + response.status);
             }
-            return response;
-        }
-        catch (err) 
-        {
-            setError(err.message);
+
+            const responseData = await response.json();
+            return responseData;
+        } catch (error) {
+            console.log(error.message);
+            setError(error.message);
+            throw error;
+        } finally {
             setIsLoading(false);
-            throw err;
         }
     }, []);
 
     const clearError = () => {
         setError(null);
-    }
+    };
 
     useEffect(() => {
-        return () => {
-            console.log(activeHttpRequests);
-            activeHttpRequests.current.forEach(abortController => abortController.abort())
-        }
+        const abortAllRequests = () => {
+            activeHttpRequests.current.forEach(controller => controller.abort());
+        };
+
+        return abortAllRequests;
     }, []);
-    
+
     return {
-        isLoading, 
+        isLoading,
         error,
         sendRequest,
         clearError
-    }
-}
+    };
+};

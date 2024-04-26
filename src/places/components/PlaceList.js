@@ -6,6 +6,7 @@ import Button from '../../shared/components/FormElements/Button/Button';
 import './PlaceList.css';
 
 const PlaceList = (props) => {
+    console.log(props);
     if(props.items.length === 0)
     return (
         <div className='place-list center'>
@@ -18,7 +19,7 @@ const PlaceList = (props) => {
     return <ul className="place-list">
         {
             props.items.map(place => (
-                <PlaceItem key={place.id} props={place}></PlaceItem>
+                <PlaceItem key={place.id} place={place} onDelete={props.onDeletePlace}></PlaceItem>
             ))
         }
     </ul>

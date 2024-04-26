@@ -1,68 +1,23 @@
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useContext, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { AuthContext } from '../../shared/context/auth-context';
 
 import Button from '../../shared/components/FormElements/Button/Button';
 import Input from '../../shared/components/FormElements/Input/Input';
 import Card from '../../shared/components/UIElements/Card/Card';
+import LoadingSpinner from '../../shared/components/UIElements/Loading/LoadingSpinner'
+import ErrorModel from '../../shared/components/UIElements/Modal/ErrorModal';
 import { VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/utils/validators';
 import { useForm } from '../../shared/hooks/form-hook';
+import {useHttpRequest} from '../../shared/hooks/http-hook';
 import './PlaceForm.css'
 
-const DUMMY_PLACES = [
-    {
-        id : 'p1',
-        title : 'Empire Estate Building',
-        description : 'One of the most famous sky scraper in the world',
-        imageUrl : 'https://placehold.co/600x400',
-        address : '20 W 34th St., New York, NY 10001, United States',
-        coordinate : {
-            lat : 40.7484405,
-            long : -73.9856644
-        },
-        creator : 'u1'  
-    },
-    {
-        id : 'p2',
-        title : 'Empire Estate Building',
-        description : 'One of the most famous sky scraper in the world',
-        imageUrl : 'https://placehold.co/600x400',
-        address : '20 W 34th St., New York, NY 10001, United States',
-        coordinate : {
-            lat : 40.7484405,
-            long : -73.9856644
-        },
-        creator : 'u2'
-    },
-    {
-        id : 'p3',
-        title : 'Empire Estate Building',
-        description : 'One of the most famous sky scraper in the world',
-        imageUrl : 'https://placehold.co/600x400',
-        address : '20 W 34th St., New York, NY 10001, United States',
-        coordinate : {
-            lat : 40.7484405,
-            long : -73.9856644
-        },
-        creator : 'u3'  
-    },
-    {
-        id : 'p4',
-        title : 'Empire Estate Building',
-        description : 'One of the most famous sky scraper in the world',
-        imageUrl : 'https://placehold.co/600x400',
-        address : '20 W 34th St., New York, NY 10001, United States',
-        coordinate : {
-            lat : 40.7484405,
-            long : -73.9856644
-        },
-        creator : 'u4'  
-    }
-];
-
 const UpdatePlace = () => {
-    const [isLoading, setIsLoading] = useState(true);
+    const auth = useContext(AuthContext);
+    const navigate = useNavigate()
     const placeId = useParams().placeId;
-
+    const [loadedPlace, setLoadedPlace] = useState();
+    const {isLoading, error, sendRequest, clearError} = useHttpRequest();
     const [formState, inputHandler, setFormData] = useForm({
         title : {
             value : '', 
@@ -71,93 +26,95 @@ const UpdatePlace = () => {
         description : {
             value : '',
             isValid : false
-        },
-        address : {
-            value : '',
-            isValid : false
         }
     }, false);
 
-    const [myPlace] = DUMMY_PLACES.filter((place) => {
-        return place.id === placeId;
-    });
     useEffect(() => {
-        if(myPlace)
-        {
-            setFormData({
-                title : {
-                    value : myPlace.title,
-                    isValid : true
-                },
-                description : {
-                    value : myPlace.description,
-                    isValid : true
-                },
-                address : {
-                    value : myPlace.address,
-                    isValid : true
-                }
-            }, true);
-        }
-        setIsLoading(false);
-    }, [myPlace, setFormData]);    
+        const getPlace = async () => {
+            try {
+                const responseData = await sendRequest(`http://localhost:4000/api/places/${placeId}`)
+                setLoadedPlace(responseData.place);
+                setFormData({
+                    title : {
+                        value : responseData.place.title,
+                        isValid : true
+                    },
+                    description : {
+                        value : responseData.place.description,
+                        isValid : true
+                    }
+                }, true);
+            }
+            catch (err)
+            {
+                console.log(err);
+            }
+        };
+        getPlace();
+    }, [sendRequest,placeId, setFormData]);   
 
-    if(!myPlace)
-    {
-        return (
-            <div className='center'>
-                <Card>
-                    <h2>No place found</h2>
-                </Card>
-            </div>
-        )
-    }
-
-    const updateSubmitHandler = (event) => {
+    
+    const updateSubmitHandler = async (event) => {
         event.preventDefault();
-        console.log(formState.inputs);
+        try {
+            await sendRequest('http://localhost:4000/api/places', 
+            'PATCH',
+            JSON.stringify({
+                placeId : placeId,
+                title : formState.inputs.title.value,
+                description : formState.inputs.description.value,
+            }),
+            {
+                'Content-Type' : 'application/json'
+            }
+            )
+            navigate(`/${auth.userId}/places`)
+            console.log(formState.inputs);
+        }
+        catch (err)
+        {
+            
+        }
     }
 
-    if(isLoading) 
-    {
-        return (
-            <div className='center'>Loading</div>
-        )
-    }
-  return (
-    <form className='place-form' onSubmit={updateSubmitHandler}>
-        <Input
-            id='title'
-            label='Title'
-            element='input'
-            placeholder='Title'
-            initialValue={formState.inputs.title.value}
-            initialIsValid={formState.inputs.title.isValid}
-            validators={[VALIDATOR_REQUIRE()]} 
-            errorText="Please enter a valid title" 
-            onInput={inputHandler}
-        ></Input>
-        <Input
-            id='description'
-            label='Description'
-            initialValue={formState.inputs.description.value}
-            initialIsValid={formState.inputs.description.isValid} 
-            validators={[VALIDATOR_MINLENGTH(5)]}
-            errorText='Please enter a valid descption. (At least 5 char)'
-            onInput={inputHandler}
-        ></Input>
-        <Input
-            id='address' 
-            label='Address'
-            element='input'
-            initialValue={formState.inputs.address.value}
-            initialIsValid={formState.inputs.address.isValue}
-            validators={[VALIDATOR_MINLENGTH(1)]}
-            errorText='Please enter a valid address'
-            onInput={inputHandler}
-        ></Input>
-        <Button type='submit' disabled={!formState.isValid}>Update</Button>
-    </form>
+    
+    return (
+        <>
+        { isLoading && <LoadingSpinner asOverlay></LoadingSpinner>}
+        { error && !loadedPlace && <ErrorModel error={error} onClear={clearError}></ErrorModel>}
+        { !isLoading && loadedPlace && (<form className='place-form' onSubmit={updateSubmitHandler}>
+            <Input
+                id='title'
+                label='Title'
+                element='input'
+                placeholder='Title'
+                initialValue={formState.inputs.title.value}
+                initialIsValid={formState.inputs.title.isValid}
+                validators={[VALIDATOR_REQUIRE()]} 
+                errorText="Please enter a valid title" 
+                onInput={inputHandler}
+                ></Input>
+            <Input
+                id='description'
+                label='Description'
+                initialValue={formState.inputs.description.value}
+                initialIsValid={formState.inputs.description.isValid} 
+                validators={[VALIDATOR_MINLENGTH(5)]}
+                errorText='Please enter a valid descption. (At least 5 char)'
+                onInput={inputHandler}
+                ></Input>
+            <Button type='submit' disabled={!formState.isValid}>Update</Button>
+        </form>)}
+        {(!loadedPlace && !error) && 
+            (
+                <div className='center'>
+                    <Card>
+                        <h2>Could not find a place.</h2>
+                    </Card>
+                </div>
+            )
+        }
+    </>
   )
 }
 

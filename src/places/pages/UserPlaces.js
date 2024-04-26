@@ -1,66 +1,41 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import PlaceList from '../components/PlaceList'
 import './UserPlaces.css'
-
-const DUMMY_PLACES = [
-    {
-        id : 'p1',
-        title : 'Empire Estate Building',
-        description : 'One of the most famous sky scraper in the world',
-        imageUrl : 'https://placehold.co/600x400',
-        address : '20 W 34th St., New York, NY 10001, United States',
-        coordinate : {
-            lat : 40.7484405,
-            long : -73.9856644
-        },
-        creator : 'u1'  
-    },
-    {
-        id : 'p2',
-        title : 'Empire Estate Building',
-        description : 'One of the most famous sky scraper in the world',
-        imageUrl : 'https://placehold.co/600x400',
-        address : '20 W 34th St., New York, NY 10001, United States',
-        coordinate : {
-            lat : 40.7484405,
-            long : -73.9856644
-        },
-        creator : 'u2'
-    },
-    {
-        id : 'p3',
-        title : 'Empire Estate Building',
-        description : 'One of the most famous sky scraper in the world',
-        imageUrl : 'https://placehold.co/600x400',
-        address : '20 W 34th St., New York, NY 10001, United States',
-        coordinate : {
-            lat : 40.7484405,
-            long : -73.9856644
-        },
-        creator : 'u3'  
-    },
-    {
-        id : 'p4',
-        title : 'Empire Estate Building',
-        description : 'One of the most famous sky scraper in the world',
-        imageUrl : 'https://placehold.co/600x400',
-        address : '20 W 34th St., New York, NY 10001, United States',
-        coordinate : {
-            lat : 40.7484405,
-            long : -73.9856644
-        },
-        creator : 'u4'  
-    }
-]
+import { useHttpRequest } from '../../shared/hooks/http-hook'
+import ErrorModal from '../../shared/components/UIElements/Modal/ErrorModal'
+import LoadingSpinner from '../../shared/components/UIElements/Loading/LoadingSpinner'
 
 const UserPlaces = () => {
+    const [filteredPlaces, setFilteredPlaces] = useState();
+    const { isLoading, error, sendRequest, clearError} = useHttpRequest();
     const userId = useParams().userId;
-    const filteredPlaces = DUMMY_PLACES.filter((place) => place.creator === userId)
-  return (
-      <PlaceList items={filteredPlaces}></PlaceList>
-  )
+    useEffect(() => {
+        (async () => {
+            try {
+                const userPlaces = await sendRequest(`http://localhost:4000/api/places/user/${userId}`);
+                setFilteredPlaces(userPlaces.userPlaces);
+            }
+            catch (err)
+            {
+                
+            }
+        })();
+    }, [sendRequest, userId]);
+
+    const onDeleteHandler = (deletedplaceId) => {
+        console.log('here');
+        console.log(deletedplaceId);
+        setFilteredPlaces(prePlaces => prePlaces.filter(place => place.id !== deletedplaceId))
+    }
+    return (
+        <>
+            { error && <ErrorModal error={error} onClear={clearError} ></ErrorModal>}
+            { isLoading && <LoadingSpinner asOverlay></LoadingSpinner>}
+            { !isLoading && filteredPlaces && (<PlaceList items={filteredPlaces} onDeletePlace={onDeleteHandler}></PlaceList>)}
+        </>
+    )
 }
 
 export default UserPlaces
