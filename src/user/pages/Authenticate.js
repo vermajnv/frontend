@@ -70,19 +70,17 @@ const Authenticate = () => {
   const loginHandler = async (event) => {
     console.log(formState.inputs);
     event.preventDefault();
+    const formData = new FormData();
     if (!isLoginMode) {
       try {
+        formData.append("name", formState.inputs.name.value);
+        formData.append("email", formState.inputs.email.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.image.value);
         const user = await sendRequest(
           "http://localhost:4000/api/users/signup",
           "POST",
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          {
-            "Content-Type": "application/json",
-          }
+          formData
         );
         auth.login(user.user._id);
         navigate("/");
