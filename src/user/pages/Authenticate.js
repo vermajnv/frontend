@@ -1,20 +1,22 @@
 import React, { useState, useContext } from "react";
-
-import Input from "../../shared/components/FormElements/Input/Input";
-import Button from "../../shared/components/FormElements/Button/Button";
-import "./Authenticate.css";
+import { AuthContext } from "../../shared/context/auth-context";
+import { useNavigate } from "react-router-dom";
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
 } from "../../shared/utils/validators";
+
+import { useHttpRequest } from "../../shared/hooks/http-hook";
 import { useForm } from "../../shared/hooks/form-hook";
+
+import Input from "../../shared/components/FormElements/Input/Input";
+import Button from "../../shared/components/FormElements/Button/Button";
+import "./Authenticate.css";
 import Card from "../../shared/components/UIElements/Card/Card";
-import { AuthContext } from "../../shared/context/auth-context";
-import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../shared/components/UIElements/Loading/LoadingSpinner";
 import ErrorModal from "../../shared/components/UIElements/Modal/ErrorModal";
-import { useHttpRequest } from "../../shared/hooks/http-hook";
+import ImageUpload from "../../shared/components/FormElements/ImageUpload/ImageUpload";
 
 const Authenticate = () => {
   const auth = useContext(AuthContext);
@@ -40,6 +42,7 @@ const Authenticate = () => {
         {
           ...formState.inputs,
           name: undefined,
+          image : undefined
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -51,6 +54,10 @@ const Authenticate = () => {
             value: "",
             isValid: false,
           },
+          image : {
+            value : null,
+            isValid : false
+          }
         },
         false
       );
@@ -61,6 +68,7 @@ const Authenticate = () => {
   const navigate = useNavigate();
 
   const loginHandler = async (event) => {
+    console.log(formState.inputs);
     event.preventDefault();
     if (!isLoginMode) {
       try {
@@ -94,14 +102,13 @@ const Authenticate = () => {
               "Content-Type": "application/json",
             }
         );
-        console.log(user);
         auth.login(user.user._id);
         navigate("/");
       } catch (err) {
         console.log(err);
       }
     }
-    console.log(formState.inputs);
+    // console.log(formState.inputs);
   };
 
   return (
@@ -113,6 +120,7 @@ const Authenticate = () => {
         <hr />
         <form onSubmit={loginHandler}>
           {!isLoginMode && (
+            <>
             <Input
               id="name"
               element="input"
@@ -123,7 +131,10 @@ const Authenticate = () => {
               onInput={inputHandler}
               value={formState.inputs.name.value}
             ></Input>
+            <ImageUpload id="image" center onInput={inputHandler}></ImageUpload>
+            </>
           )}
+
           <Input
             id="email"
             element="input"
