@@ -28,10 +28,6 @@ const PlaceItem = (props) => {
         setShowConfirmModal(true)
     }
 
-    // const hideConfirmModalHander = () => {
-    //     setShowConfirmModal(false)
-    // }
-
     const deletePlaceHandler = async() => {
         setShowConfirmModal(false);
         try {
@@ -79,7 +75,7 @@ const PlaceItem = (props) => {
         <Card className='place-item__content'>
         {isLoading && <LoadingSpinner asOverlay></LoadingSpinner>}
             <div className="place-item__image">
-                <img src={props.place.image} alt={props.place.title} />
+                <img src={`http://localhost:4000/${props.place.image}`} alt={props.place.title} />
             </div>
             <div className="place-item__info">
                 <h2>{props.place.title}</h2>

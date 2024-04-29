@@ -25,8 +25,6 @@ const UserPlaces = () => {
     }, [sendRequest, userId]);
 
     const onDeleteHandler = (deletedplaceId) => {
-        console.log('here');
-        console.log(deletedplaceId);
         setFilteredPlaces(prePlaces => prePlaces.filter(place => place.id !== deletedplaceId))
     }
     return (
