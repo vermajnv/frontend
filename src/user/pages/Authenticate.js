@@ -68,7 +68,6 @@ const Authenticate = () => {
   const navigate = useNavigate();
 
   const loginHandler = async (event) => {
-    console.log(formState.inputs);
     event.preventDefault();
     const formData = new FormData();
     if (!isLoginMode) {

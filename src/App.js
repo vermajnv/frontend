@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Users from "./user/pages/Users";
@@ -14,15 +14,28 @@ function App() {
   const [token, setToken] = useState(false);
   const [userId, setUserId] = useState(null);
 
-  const login = useCallback((userId, token) => {
+  const login = useCallback((userId, token, tokenExpIn) => {
     setToken(token);
+    const expirationTime = tokenExpIn || new Date(new Date().getTime() + 1000 * 60 * 60);
+
+    localStorage.setItem('userData',  JSON.stringify({ userId : userId, token : token, tokenExpirationTime : expirationTime.toISOString()}));
+    
     setUserId(userId);
   }, []);
-
+  
   const logout = useCallback(() => {
     setToken(null);
     setUserId(null);
+    localStorage.removeItem('userData');
   }, []);
+  
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem('userData'));
+    if(storedData && storedData.token && new Date(storedData.tokenExpirationTime) > new Date())
+    {
+      login(storedData.userId, storedData.token, new Date(storedData.tokenExpirationTime));
+    }
+  }, [login]);
 
   return (
     <AuthContext.Provider
