@@ -65,11 +65,11 @@ const UpdatePlace = () => {
                 description : formState.inputs.description.value,
             }),
             {
-                'Content-Type' : 'application/json'
+                'Content-Type' : 'application/json',
+                Authorization : 'Bearer ' + auth.token
             }
             )
             navigate(`/${auth.userId}/places`)
-            console.log(formState.inputs);
         }
         catch (err)
         {
@@ -77,7 +77,6 @@ const UpdatePlace = () => {
         }
     }
 
-    
     return (
         <>
         { isLoading && <LoadingSpinner asOverlay></LoadingSpinner>}

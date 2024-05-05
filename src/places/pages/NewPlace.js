@@ -48,6 +48,9 @@ const NewPlace = () => {
       console.log(formData);
       await sendRequest('http://localhost:4000/api/places', 'POST', 
         formData,
+        {
+          Authorization : 'Bearer ' + auth.token
+        }
       );
       navigate('/');
     }

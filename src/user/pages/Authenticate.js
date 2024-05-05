@@ -77,19 +77,19 @@ const Authenticate = () => {
         formData.append("email", formState.inputs.email.value);
         formData.append("password", formState.inputs.password.value);
         formData.append("image", formState.inputs.image.value);
-        const user = await sendRequest(
+        const response = await sendRequest(
           "http://localhost:4000/api/users/signup",
           "POST",
           formData
         );
-        auth.login(user.user._id);
+        auth.login(response.user._id, response.token);
         navigate("/");
       } catch (err) {
         console.log(err);
       }
     } else {
       try {
-        const user = await sendRequest(
+        const response = await sendRequest(
           "http://localhost:4000/api/users/login",
           "POST",
           JSON.stringify({
@@ -100,7 +100,8 @@ const Authenticate = () => {
               "Content-Type": "application/json",
             }
         );
-        auth.login(user.user._id);
+        auth.login(response.user._id, response.token);
+        console.log(auth);
         navigate("/");
       } catch (err) {
         console.log(err);

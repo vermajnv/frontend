@@ -12,22 +12,22 @@ const NavLinks = (props) => {
         <li>
             <NavLink to='/' exact="true">All Users</NavLink>
         </li>
-        {auth.isLogin && (
+        {auth.token && (
             <li>
                 <NavLink to={`/${auth.userId}/places`}>My Places</NavLink>
             </li>
         )}
-        {auth.isLogin && (
+        {auth.token && (
             <li>
                 <NavLink to='/places/new'>Add Place</NavLink>
             </li>
         )}
-        {!auth.isLogin && (
+        {!auth.token && (
             <li>
                 <NavLink to='/auth'>Authenticate</NavLink>
             </li>
         )}
-        {auth.isLogin && (
+        {auth.token && (
             <li>
                 <button onClick={auth.logout}>Logout</button>
             </li>
