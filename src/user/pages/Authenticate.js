@@ -100,13 +100,11 @@ const Authenticate = () => {
             }
         );
         auth.login(response.user._id, response.token);
-        console.log(auth);
         navigate("/");
       } catch (err) {
         console.log(err);
       }
     }
-    // console.log(formState.inputs);
   };
 
   return (
