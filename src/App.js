@@ -1,5 +1,3 @@
-import React, { useCallback, useEffect, useState } from "react";
-
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Users from "./user/pages/Users";
 import NewPlace from "./places/pages/NewPlace";
@@ -9,67 +7,10 @@ import UpdatePlace from "./places/pages/UpdatePlace";
 import Authenticate from "./user/pages/Authenticate";
 import { AuthContext } from "./shared/context/auth-context";
 import PrivateRoutes from "./shared/utils/PrivateRoutes";
-
-let logoutTimer;
+import { useAuth } from "./shared/hooks/auth-hook";
 
 function App() {
-  const [token, setToken] = useState(false);
-  const [userId, setUserId] = useState(null);
-  const [tokenExpirationTime, setTokenExpirationTime] = useState(null);
-
-  const login = useCallback((userId, token, tokenExpIn) => {
-    setToken(token);
-    console.log(tokenExpIn);
-    const expirationTime =
-      tokenExpIn || new Date(new Date().getTime() + 2000 * 60 * 60);
-    setTokenExpirationTime(expirationTime);
-    localStorage.setItem(
-      "userData",
-      JSON.stringify({
-        userId: userId,
-        token: token,
-        expiration: expirationTime.toISOString(),
-      })
-    );
-
-    setUserId(userId);
-  }, []);
-
-  const logout = useCallback(() => {
-    setToken(null);
-    setUserId(null);
-    localStorage.removeItem("userData");
-    setTokenExpirationTime(null);
-  }, []);
-
-  useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem("userData"));
-    if (
-      storedData &&
-      storedData.token &&
-      new Date(storedData.expiration) > new Date()
-    ) {
-      console.log('here in login');
-      login(
-        storedData.userId,
-        storedData.token,
-        new Date(storedData.expiration)
-      );
-    }
-  }, [login]);
-
-  useEffect(() => {
-    if(tokenExpirationTime)
-    {
-      const remainingTime = tokenExpirationTime.getTime() - new Date().getTime();
-      
-      if (token && remainingTime > 0) {
-        logoutTimer = setTimeout(logout, remainingTime);
-      } else {
-        clearTimeout(logoutTimer);
-      }
-    }
-  }, [tokenExpirationTime, logout, token]);
+  const {login, logout, token, userId} = useAuth();
 
   return (
     <AuthContext.Provider
