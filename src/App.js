@@ -19,9 +19,9 @@ function App() {
 
   const login = useCallback((userId, token, tokenExpIn) => {
     setToken(token);
-    console.log(new Date().getTime());
+    console.log(tokenExpIn);
     const expirationTime =
-      tokenExpIn || new Date(new Date().getTime() + 2000);
+      tokenExpIn || new Date(new Date().getTime() + 2000 * 60 * 60);
     setTokenExpirationTime(expirationTime);
     localStorage.setItem(
       "userData",
@@ -62,12 +62,9 @@ function App() {
     if(tokenExpirationTime)
     {
       const remainingTime = tokenExpirationTime.getTime() - new Date().getTime();
-      console.log('here');
-      console.log(remainingTime);
-      if (token && remainingTime < 0) {
-        logoutTimer = setTimeout(logout, () => {
-          console.log('in time out');
-        }, remainingTime);
+      
+      if (token && remainingTime > 0) {
+        logoutTimer = setTimeout(logout, remainingTime);
       } else {
         clearTimeout(logoutTimer);
       }
