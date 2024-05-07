@@ -12,9 +12,10 @@ const UserPlaces = () => {
     const { isLoading, error, sendRequest, clearError} = useHttpRequest();
     const userId = useParams().userId;
     useEffect(() => {
+        console.log(process.env);
         (async () => {
             try {
-                const userPlaces = await sendRequest(`http://localhost:4000/api/places/user/${userId}`);
+                const userPlaces = await sendRequest(`${process.env.REACT_APP_API_URL}/places/user/${userId}`);
                 setFilteredPlaces(userPlaces.userPlaces);
             }
             catch (err)

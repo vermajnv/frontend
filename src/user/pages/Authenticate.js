@@ -77,7 +77,7 @@ const Authenticate = () => {
         formData.append("password", formState.inputs.password.value);
         formData.append("image", formState.inputs.image.value);
         const response = await sendRequest(
-          "http://localhost:4000/api/users/signup",
+          `${process.env.REACT_APP_API_URL}/users/signup`,
           "POST",
           formData
         );
@@ -89,7 +89,7 @@ const Authenticate = () => {
     } else {
       try {
         const response = await sendRequest(
-          "http://localhost:4000/api/users/login",
+          `${process.env.REACT_APP_API_URL}/users/login`,
           "POST",
           JSON.stringify({
               email: formState.inputs.email.value,
