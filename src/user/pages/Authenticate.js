@@ -67,6 +67,15 @@ const Authenticate = () => {
 
   const navigate = useNavigate();
 
+  const socialLoginHandler = async (event) => {
+    const response = await fetch('http://localhost:4000/api/users/oauth/google', {
+      method : 'post'
+    });
+    const data = await response.json();
+    console.log(data.authorizedUrl);
+    window.location.href = data.authorizedUrl;
+  }
+
   const loginHandler = async (event) => {
     event.preventDefault();
     const formData = new FormData();
@@ -108,7 +117,7 @@ const Authenticate = () => {
   };
 
   return (
-    <>
+    <div className="auth-container">
       <ErrorModal error={error} onClear={clearError}></ErrorModal>
       <Card className="authentication">
         {isLoading && <LoadingSpinner asOverlay></LoadingSpinner>}
@@ -157,11 +166,14 @@ const Authenticate = () => {
             {isLoginMode ? "LOGIN" : "SIGNUP"}
           </Button>
         </form>
+        <button onClick={socialLoginHandler}>
+          <img src= {isLoginMode ? "/social/images/google-signin.jpeg" : "/social/images/google-signup.png"} alt="" />
+        </button>
         <Button inverse onClick={switchModeHandler}>
           Switch To {isLoginMode ? "SIGNUP" : "SIGNIN"}
         </Button>
       </Card>
-    </>
+    </div>
   );
 };
 export default Authenticate;
